@@ -1,0 +1,18 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+body {
+    color: #000;
+    font-family: Monospace;
+    font-size: 13px;
+    margin: 0px;
+    overflow: hidden;
+    /*background: #D66D75;  /* fallback for old browsers */
+    /*background: -webkit-linear-gradient(to top, #E29587, #D66D75);  /* Chrome 10-25, Safari 5.1-6 */
+    /*background: linear-gradient(to top, #E29587, #D66D75); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background:#1a1a1a;
+    
+}
