@@ -24,7 +24,8 @@ export default class App {
 
         this.cubeArr = []
         this.starArr = []
-        this.currArr = [];
+        this.currArr = []
+        this.torusArr = []
         
         this.kick = this.audio.createKick({
           decay: 5,
@@ -43,13 +44,18 @@ export default class App {
 
         this.changingState = false;
         this.changingState2 = false;
+        this.changingState3 = false;
         setTimeout(() =>{
             this.changingState = true;
-        }, 4000)
+        }, 11000)
         setTimeout(()=>{
             this.changingState = false;
             this.changingState2 = true
-        }, 8000)
+        }, 13500)
+        setTimeout(()=>{
+            this.changingState2 = false;
+            this.changingState3 = true
+        }, 17500)
 
        this.beat = this.audio.createBeat(4, () => {console.log('Beat!')})
         this.beat.on()
@@ -70,7 +76,7 @@ export default class App {
         this.controls = new OrbitControls(this.camera)
 
     	this.scene = new THREE.Scene();
-        var axisHelper = new THREE.AxisHelper( 50 );
+        //var axisHelper = new THREE.AxisHelper( 50 );
         
         
         
@@ -112,6 +118,17 @@ export default class App {
             this.cubeArr.push(cubePosition)
         }
 
+        for(var i = 0; i < 100000; i++){
+            var torusPosition = new THREE.Vector3()
+            this.alpha = Math.random()*(Math.PI*2)
+            this.theta = Math.random()*(Math.PI*2)
+            torusPosition.x = (1+(1+Math.cos(this.theta)))*Math.cos(this.alpha)
+            torusPosition.y = (1+(1+Math.cos(this.theta)))*Math.sin(this.alpha)
+            torusPosition.z = Math.sin(this.theta)
+
+            this.torusArr.push(torusPosition)
+        }
+
 
         console.log(this.cubeArr[0].x)
             
@@ -131,7 +148,7 @@ export default class App {
 
         this.starField = new THREE.Points(this.starsGeometry , this.starsMaterial );
         this.scene.add( this.starField );
-        this.scene.add( axisHelper );
+        //this.scene.add( axisHelper );
 
         
         this.spheres = []
@@ -194,68 +211,36 @@ export default class App {
 
 
     this.starsGeometry.verticesNeedUpdate = true
-    // if(this.audio.getSpectrum()[0] <= 50){
-    //     console.log("im true")
-    //     for(var i = 0; i < 100000; i++){
-
-    //         this.alpha = Math.random()*(Math.PI*2)
-    //         this.theta = Math.random()*(Math.PI*2)
-    //         this.starsGeometry.vertices[i].x = (1+(1+Math.cos(this.theta)))*Math.cos(this.alpha)
-    //         this.starsGeometry.vertices[i].y = (1+(1+Math.cos(this.theta)))*Math.sin(this.alpha)
-    //         this.starsGeometry.vertices[i].z = Math.sin(this.theta)
-    //     }
-    // }
-    // if (this.changingState){
-    //     for(var i = 0; i < 100000; i++){
-    //         this.starsGeometry.vertices[i].x = Math.random()*2-1
-    //         this.starsGeometry.vertices[i].y = Math.random()*2-1
-    //         this.starsGeometry.vertices[i].z = Math.random()*2-1
-    //     }
-    //     this.posDep = this.starsGeometry.vertices
-
-    // }   
-    // else if(!this.changingState){
-    //     console.log('im false')
-    //     // for(var i = 0; i < 100000; i++){
-    //     //     var newPos = new THREE.Vector3();
-    //     //     this.alpha = Math.random()*(Math.PI)
-    //     //     this.theta = Math.random()*(Math.PI*2)
-    //     //     newPos.x = Math.cos(this.alpha)*Math.sin(this.theta)
-    //     //     newPos.y = Math.sin(this.alpha)*Math.sin(this.theta)
-    //     //     newPos.z = Math.cos(this.theta)
-    //     //     this.posArr.push(newPos)
-    //     // }
-
-    // }
 
         if(this.changingState){
             console.log('cube')
             for(var i=0; i< 100000; i++){
                 
-                this.currArr[i].x += (this.cubeArr[i].x - this.currArr[i].x) * 0.1
-                this.currArr[i].y += (this.cubeArr[i].y - this.currArr[i].y) * 0.1
-                this.currArr[i].z += (this.cubeArr[i].z - this.currArr[i].z) * 0.1
+                this.currArr[i].x += (this.cubeArr[i].x - this.currArr[i].x) * 0.05
+                this.currArr[i].y += (this.cubeArr[i].y - this.currArr[i].y) * 0.05
+                this.currArr[i].z += (this.cubeArr[i].z - this.currArr[i].z) * 0.05
             }
             
         }
-
-        //console.log(this.starsGeometry.vertices[0].x)
 
         if(this.changingState2){
             console.log('sphere')
             for(var i=0; i< 100000; i++){
 
-                this.currArr[i].x += (this.starArr[i].x - this.currArr[i].x) * 0.1
-                this.currArr[i].y += (this.starArr[i].y - this.currArr[i].y) * 0.1
-                this.currArr[i].z += (this.starArr[i].z - this.currArr[i].z) * 0.1
+                this.currArr[i].x += (this.starArr[i].x - this.currArr[i].x) * 0.05
+                this.currArr[i].y += (this.starArr[i].y - this.currArr[i].y) * 0.05
+                this.currArr[i].z += (this.starArr[i].z - this.currArr[i].z) * 0.05
             }
-            //console.log(this.starsGeometry.vertices[0].x)
         }
 
-        //console.log(this.cubeArr[0].x)
-        //console.log(this.starArr[0].x)
-        //console.log(p1x)
-        //console.log(p2x)
+        if(this.changingState3){
+            console.log('torus')
+            for(var i=0; i< 100000; i++){
+                this.currArr[i].x += (this.torusArr[i].x - this.currArr[i].x) * 0.05
+                this.currArr[i].y += (this.torusArr[i].y - this.currArr[i].y) * 0.05
+                this.currArr[i].z += (this.torusArr[i].z - this.currArr[i].z) * 0.05
+            }
+        }
 
 
         if(this.audio.getSpectrum()[0] > 2) {
