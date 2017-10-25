@@ -229,13 +229,18 @@ export default class Sound {
         return this.frequencyDataArray;
     }
 
+    arrAverage(arr) {
+        var sum = arr.reduce(function(a, b) { return a + b; });
+        return sum / arr.length;
+    }
+
     getAverage() {
         var cumul = 0;
-        console.log(this.getSpectrum())
-        for(var i = 0; i < this.getSpectrum().length; i++){
-            cumul += this.getSpectrum()[i];
+        var spectrum = this.getSpectrum()
+        for(var i = 0; i < spectrum.length; i++){
+            cumul += spectrum[i];
         }
-        return cumul / this.getSpectrum().length 
+        return cumul / spectrum.length 
     }
 
     getWaveform() {

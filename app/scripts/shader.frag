@@ -1,7 +1,7 @@
 uniform float u_time;
 
-vec3 colorA = vec3(0.94,0.2,0.85);
-vec3 colorB = vec3(0.54,1.00,0.99);
+vec3 colorA = vec3(0.48,0.26,0.59);
+vec3 colorB = vec3(0.86,0.14,0.19);
 
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -97,6 +97,6 @@ void main() {
 
   color = mix(colorA, colorB, pct); 
 
-  gl_FragColor = vec4(color,1.0);
+  gl_FragColor = vec4(color,0.1);
   
 }
