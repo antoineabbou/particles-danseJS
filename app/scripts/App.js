@@ -3,221 +3,152 @@
 
 // TODO : add Dat.GUI
 // TODO : add Stats
-import OrbitControls from 'imports-loader?THREE=three!exports-loader?THREE.OrbitControls!three/examples/js/controls/OrbitControls' // eslint-disable-line import/no-webpack-loader-syntax
-import vertShader from './shader.vert'
-import fragShader from './shader.frag'
-import Sound from './Sound'
-import flume from './flume.mp3'
-import {TweenMax, Power2, TimelineLite} from 'gsap';
+
+
+//import Utils
+import OrbitControls from 'imports-loader?THREE=three!exports-loader?THREE.OrbitControls!three/examples/js/controls/OrbitControls' 
+import Sound from './utils/Sound'
+import Audio from '../assets/audio/gramatik.mp3'
+
+//import Shaders 
+import vertParticles from './glsl/shaders/particles/particles.vert'
+import fragParticles from './glsl/shaders/particles/particles.frag'
+
+// import Shapes
+import Initial from './shapes/initial'
+import Cube from './shapes/cube'
+import Octa from './shapes/octa'
+import Sphere from './shapes/sphere'
+import Tear from './shapes/tear'
+import Torus from './shapes/torus'
+import Particles from './shapes/particles'
+
+
 
 export default class App {
 
     constructor() {
+        //Canvas
+        this.container = document.querySelector( '#main' );
+    	document.body.appendChild( this.container );
 
-        this.audio = new Sound( flume, 102, .3, null, false )
+        //Camera
+        this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, this.resolutionZ );
+        this.camera.position.z = 250;
+        this.camera.position.y = 150;
+        this.speedCamera = 1
+        
+        //Controls
+        this.controls = new OrbitControls(this.camera)
 
+        //Scene
+        this.scene = new THREE.Scene();
+        this.time = 0
         this.resolutionX = window.innerWidth
         this.resolutionY = window.innerHeight
         this.resolutionZ = 10000
 
-        this.ratio = 0.5
+        //Axis Helper
+        var axisHelper = new THREE.AxisHelper( 50 )
 
-        this.cubeArr = []
-        this.starArr = []
-        this.currArr = []
-        this.torusArr = []
-        this.tearArr = []
-        this.pyramidArr = []
-        
-        // this.kick = this.audio.createKick({
-        //   frequency: 0,
-        //   decay: 0.9,
-        //   threshold: 255,
-        //   onKick: () => {console.log('kick')},
-        //   offKick: () => {console.log('offkick')}
-        // })
-        
-        this.speed = 1
+        //Audio
+        this.audio = new Sound( Audio, 102, .3, null, false )
+        this.audio._load(Audio, () => {
+            this.audio.play()
+        });
+
+        //Beat check
+        this.beat = this.audio.createBeat(4, () => {console.log('Beat!')})
+        this.beat.on()
+
+        //Kick check
         this.kick = this.audio.createKick({
-            frequency: 0,
-            decay:0.5,
-            threshold: 255,
+            frequency: 200,
+            decay:1,
+            threshold: 5,
             onKick: () => {
-               if(this.kickTempo > 80){
+               if(this.kickTempo > 50){
                     this.kickTempo = 0
-                    console.log('kick')
-                    this.changingState4 = false
-                    this.changingState3 = true
-                    // this.speed = Math.random()*this.speed
-                    // setTimeout(() => {
-                    //     this.speed += 2
-                    // }, 1000)
+                    this.getNewPattern()
+                    this.changingState = true
+                    this.speedCamera = 2
+                    setTimeout(()=>{
+                        this.speedCamera = -2
+                    }, 3000)
                 }
-            },
+            }
         }) 
         this.kick.on()
         this.kickTempo = 0;
 
+        //particles / points stuff
+        this.nbParticles = 80000
+        this.nbPoints = 100
+        this.ratio = 0.05
 
         
-        this.animEnter = {
-            now: Date.now(),
-            last : Date.now(),
-            duration: 12000,
-            timepast: 0
+        //instance of the first shape 
+        this.initial = new Initial(this.nbParticles)
+
+        //instances of shapes
+        this.cube = new Cube(this.nbParticles);
+        this.octa = new Octa(this.nbParticles)
+        this.sphere = new Sphere(this.nbParticles)
+        this.tear = new Tear(this.nbParticles)
+        this.torus = new Torus(this.nbParticles)
+        this.particles = new Particles(this.nbPoints)
+
+        //States Manager
+        
+        this.states = []
+        this.cubeState = {
+            type : 'cube', 
+            isActive : false, 
+            data: this.cube
         }
-
-        this.changingState = false;
-        this.changingState2 = false;
-        this.changingState3 = false;
-        this.changingState4 = false;
-        setTimeout(() =>{
-            this.changingState = true;
-        }, 1000)
-        setTimeout(()=>{
-            this.changingState = false;
-            this.changingState2 = true
-        }, 3500)
-        setTimeout(()=>{
-            this.changingState2 = false;
-            this.changingState3 = true
-        }, 7500)
-
-        setTimeout(()=>{
-            this.changingState3 = false;
-            this.changingState2 = true
-        }, 9000)
-        setTimeout(()=>{
-            this.changingState2 = false;
-            this.changingState4 = true
-        }, 11000)
-       this.beat = this.audio.createBeat(4, () => {console.log('Beat!')})
-        this.beat.on()
-        this.audio._load(flume, () => {
-          this.audio.play()
-        });
-
-
-        this.time = 0;
-        this.container = document.querySelector( '#main' );
-    	document.body.appendChild( this.container );
-
-        this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, this.resolutionZ );
-
-        this.camera.position.z = 250;
-        this.camera.position.y = 150;
-
-        this.controls = new OrbitControls(this.camera)
-
-    	this.scene = new THREE.Scene();
-        //var axisHelper = new THREE.AxisHelper( 50 );
-        
-        
-        
-        this.starsGeometry = new THREE.Geometry();
-        
-        for ( var i = 0; i < 100000; i ++ )   {
-
-                var star = new THREE.Vector3();
-                this.alpha = Math.random()*(Math.PI)
-                this.theta = Math.random()*(Math.PI*2)
-
-                star.x = Math.cos(this.alpha)*Math.sin(this.theta)
-                star.y = Math.sin(this.alpha)*Math.sin(this.theta)
-                star.z = Math.cos(this.theta)
-        
-                this.starsGeometry.vertices.push( star );
-                this.currArr.push(star);
+        this.octaState = {
+            type : 'octa', 
+            isActive : false, 
+            data: this.octa
         }
-
-        for ( var i = 0; i < 100000; i ++ )   {
-            
-                var star = new THREE.Vector3();
-                this.alpha = Math.random()*(Math.PI)
-                this.theta = Math.random()*(Math.PI*2)
-
-                star.x = Math.cos(this.alpha)*Math.sin(this.theta)
-                star.y = Math.sin(this.alpha)*Math.sin(this.theta)
-                star.z = Math.cos(this.theta)
-        
-                this.starArr.push(star)
+        this.sphereState = {
+            type : 'sphere', 
+            isActive : false, 
+            data: this.sphere
         }
-        
-        for(var i = 0; i < 100000; i++){
-            var cubePosition = new THREE.Vector3()
-            cubePosition.x = Math.random()*2-1
-            cubePosition.y = Math.random()*2-1
-            cubePosition.z = Math.random()*2-1
-
-            this.cubeArr.push(cubePosition)
+        this.tearState = {
+            type : 'tear', 
+            isActive : false, 
+            data: this.tear
         }
-
-        for(var i = 0; i < 100000; i++){
-            var torusPosition = new THREE.Vector3()
-            this.alpha = Math.random()*(Math.PI*2)
-            this.theta = Math.random()*(Math.PI*2)
-            torusPosition.x = (1+(1+Math.cos(this.theta)))*Math.cos(this.alpha)
-            torusPosition.y = (1+(1+Math.cos(this.theta)))*Math.sin(this.alpha)
-            torusPosition.z = Math.sin(this.theta)
-
-            this.torusArr.push(torusPosition)
+        this.torusState = {
+            type : 'torus', 
+            isActive : false, 
+            data: this.torus
         }
-
-        for(var i = 0; i < 100000; i++){
-            var tearPosition = new THREE.Vector3()
-            // this.alpha = Math.random()*(Math.PI*2)-(Math.random()*Math.PI*2)
-            // this.theta = Math.random()*(Math.PI)-(Math.random()*Math.PI*2)
-            // pyramidPosition.x = Math.pow(Math.cos(this.alpha)*Math.cos(this.theta), 3)
-            // pyramidPosition.y = Math.pow(Math.sin(this.alpha)*Math.cos(this.theta), 3)
-            // pyramidPosition.z = Math.pow(Math.sin(this.theta), 3)
-
-            this.alpha =Math.random()*2*Math.PI;
-            this.theta = Math.random()*Math.PI;
+        this.states.push(this.cubeState, this.octaState, this.sphereState, this.tearState, this.torusState)
     
-            tearPosition.x = 0.7*(Math.cos(this.theta)*Math.sin(this.theta)*Math.cos(this.alpha))*2;
-            tearPosition.y = -Math.sin(this.theta)*2+1;
-            tearPosition.z = 0.7*(Math.cos(this.theta)*Math.sin(this.theta)*Math.sin(this.alpha))*2;
 
-            this.tearArr.push(tearPosition)
-
+        //Instances of white particles
+        for(var i = 0; i < this.nbPoints; i++){
+            this.scene.add(this.particles.particles[i]);
         }
-        //console.log(this.cubeArr[0].x)
-            
 
         var uniforms = {
             u_time: { type: "f", value: 1.0 },
-            u_frequency: {type: "f", value: this.audio.getAverage()}, 
+            u_frequency: {type: "f", value: this.audio.arrAverage(this.audio.getSpectrum())}, 
             u_resolution: {type: "f", value: window.innerWidth},
             u_enter_anim: {type: "f", value: 0}
         }
 
-        this.starsMaterial = new THREE.ShaderMaterial( { 
+        this.particlesMaterial = new THREE.ShaderMaterial( { 
             uniforms : uniforms,
-            vertexShader: vertShader,
-            fragmentShader: fragShader
+            vertexShader: vertParticles,
+            fragmentShader: fragParticles
          } );
 
-        this.starField = new THREE.Points(this.starsGeometry , this.starsMaterial );
-        this.scene.add( this.starField );
-        //this.scene.add( axisHelper );
-
-        
-        this.spheres = []
-        for ( var i = 0; i < 100; i ++ )   {
- 
-             var particle = new THREE.Vector3();
-
-             var geometry = new THREE.SphereGeometry( 0.4, 32, 32 );
-             var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
-             var sphere = new THREE.Mesh( geometry, material );
-             sphere.position.x = Math.random() * 1000 - 500;
-             sphere.position.y = Math.random() * 1000 - 500;
-             sphere.position.z = Math.random() * 1000 - 500;
-             this.scene.add( sphere );
-             this.spheres.push(sphere)
- 
-         }
-
+        this.particlesField = new THREE.Points(this.initial.initialGeometry , this.particlesMaterial );
+        this.scene.add( this.particlesField );
 
     	this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
     	this.renderer.setPixelRatio( window.devicePixelRatio );
@@ -230,87 +161,63 @@ export default class App {
         this.renderer.animate( this.render.bind(this) );
     }
     
+    displacement() {
+            for(var i=0; i< this.nbParticles; i++){
+                
+                this.initial.points[i].x += (this.currentPattern.data.points[i].x - this.initial.points[i].x) * this.ratio
+                this.initial.points[i].y += (this.currentPattern.data.points[i].y - this.initial.points[i].y) * this.ratio
+                this.initial.points[i].z += (this.currentPattern.data.points[i].z - this.initial.points[i].z) * this.ratio
+            }
+            
+    }
+
+    getNewPattern() {
+        let nextPatterns = this.states.filter((state) => {
+            return state.isActive != true;
+          });
+      
+        let currentPattern = nextPatterns[Math.floor(Math.random() * nextPatterns.length)];
+      
+        // Remove isActive
+        this.states.forEach((state) => {
+            state.isActive = false;
+        });
+      
+        currentPattern.isActive = true;
+      
+        this.currentPattern = currentPattern;
+
+    }
+
+    checkPattern(){
+        
+        if((this.changingState) && ((this.currentPattern.type == 'sphere') || (this.currentPattern.type == 'torus'))){
+            this.particlesMaterial.uniforms.u_frequency.value = this.audio.arrAverage(this.audio.getSpectrum())/5
+        }
+    }
 
     render() {
 
         this.kickTempo += 1
         this.time += 0.01;
-        var now = Date.now();
-        this.animEnter.timepast += now - this.animEnter.last;
-        this.animEnter.last = now;
-
-        var advance = Math.min(1.1, this.animEnter.timepast/this.animEnter.duration);
-
-        this.starsMaterial.uniforms.u_time.value = this.time;
-        this.starsMaterial.uniforms.u_time.value = this.time;        
-        this.starsMaterial.uniforms.u_enter_anim.value = advance;        
-        this.starsMaterial.uniforms.u_frequency.value = this.audio.getSpectrum()[0]/7;
-
-
-        for(var i=0; i<this.spheres.length; i++) {
-			
-			var sphere = this.spheres[i]; 
-				
-			// and move it forward dependent on the mouseY position. 
-			sphere.position.z +=  i/5;
-				
-			// if the particle is too close move it to the back
-			if(sphere.position.z>1000) sphere.position.z-=2000; 
-			
-        }
-        
-    //console.log(this.audio.arrAverage(this.audio.getSpectrum()))
     
 
+        this.particlesMaterial.uniforms.u_time.value = this.time;
+        this.particlesMaterial.uniforms.u_frequency.value = 1
+        this.checkPattern()      
 
-    this.starsGeometry.verticesNeedUpdate = true
+        this.particles.moveParticles()        
+
+        this.initial.initialGeometry.verticesNeedUpdate = true
 
         if(this.changingState){
-            //console.log('cube')
-            for(var i=0; i< 100000; i++){
-                
-                this.currArr[i].x += (this.cubeArr[i].x - this.currArr[i].x) * 0.05
-                this.currArr[i].y += (this.cubeArr[i].y - this.currArr[i].y) * 0.05
-                this.currArr[i].z += (this.cubeArr[i].z - this.currArr[i].z) * 0.05
-            }
-            
+            this.displacement()
         }
-
-        if(this.changingState2){
-            //console.log('sphere')
-            for(var i=0; i< 100000; i++){
-
-                this.currArr[i].x += (this.starArr[i].x - this.currArr[i].x) * 0.05
-                this.currArr[i].y += (this.starArr[i].y - this.currArr[i].y) * 0.05
-                this.currArr[i].z += (this.starArr[i].z - this.currArr[i].z) * 0.05
-            }
-        }
-
-        if(this.changingState3){
-            //console.log('torus')
-            for(var i=0; i< 100000; i++){
-                this.currArr[i].x += (this.torusArr[i].x - this.currArr[i].x) * 0.05
-                this.currArr[i].y += (this.torusArr[i].y - this.currArr[i].y) * 0.05
-                this.currArr[i].z += (this.torusArr[i].z - this.currArr[i].z) * 0.05
-            }
-        }
-
-        if(this.changingState4){
-            //console.log('tear')
-            for(var i=0; i< 100000; i++){
-                this.currArr[i].x += (this.tearArr[i].x - this.currArr[i].x) * 0.05
-                this.currArr[i].y += (this.tearArr[i].y - this.currArr[i].y) * 0.05
-                this.currArr[i].z += (this.tearArr[i].z - this.currArr[i].z) * 0.05
-            }
-        }
-
-        if(this.audio.getSpectrum()[0] > 2) {
-            this.camera.z += 0.1
-        }
-        this.camera.position.x = this.starField.position.x + 200 * Math.cos( this.time*this.speed );         
-        this.camera.position.y = this.starField.position.z + 200 * Math.sin( this.time*this.speed);
-        this.camera.position.z = this.starField.position.z + 200 * Math.sin( this.time*this.speed );
-        this.camera.lookAt( this.starField.position );
+    
+        this.camera.position.x = this.particlesField.position.x + 200 * Math.cos( this.time*this.speedCamera );         
+        this.camera.position.y = this.particlesField.position.z + 200 * Math.sin( this.time*this.speedCamera);
+        this.camera.position.z = this.particlesField.position.z + 200 * Math.sin( this.time*this.speedCamera);
+        this.camera.lookAt( this.particlesField.position );
 
         this.renderer.render( this.scene, this.camera );
         

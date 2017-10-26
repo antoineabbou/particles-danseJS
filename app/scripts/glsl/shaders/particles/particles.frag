@@ -1,8 +1,7 @@
 uniform float u_time;
 
-vec3 colorA = vec3(0.48,0.26,0.59);
-vec3 colorB = vec3(0.86,0.14,0.19);
-
+vec3 colorA = vec3(0.81,0.30,0.67);
+vec3 colorB = vec3(0.51,0.44,0.64);
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }

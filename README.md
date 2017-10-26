@@ -1,7 +1,7 @@
-# Three.js Boilerplate
+# Particles danse
 
 ## Setup
-
+* After cloning the project 
 * Execute `npm install`
 
 ## Environments
