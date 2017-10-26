@@ -26,15 +26,39 @@ export default class App {
         this.starArr = []
         this.currArr = []
         this.torusArr = []
+        this.tearArr = []
         this.pyramidArr = []
         
+        // this.kick = this.audio.createKick({
+        //   frequency: 0,
+        //   decay: 0.9,
+        //   threshold: 255,
+        //   onKick: () => {console.log('kick')},
+        //   offKick: () => {console.log('offkick')}
+        // })
+        
+        this.speed = 1
         this.kick = this.audio.createKick({
-          decay: 5,
-          threshold: 0.5,
-          onKick: () => {},
-          offKick: () => {}
-        })
+            frequency: 0,
+            decay:0.5,
+            threshold: 255,
+            onKick: () => {
+               if(this.kickTempo > 80){
+                    this.kickTempo = 0
+                    console.log('kick')
+                    this.changingState4 = false
+                    this.changingState3 = true
+                    // this.speed = Math.random()*this.speed
+                    // setTimeout(() => {
+                    //     this.speed += 2
+                    // }, 1000)
+                }
+            },
+        }) 
         this.kick.on()
+        this.kickTempo = 0;
+
+
         
         this.animEnter = {
             now: Date.now(),
@@ -49,24 +73,24 @@ export default class App {
         this.changingState4 = false;
         setTimeout(() =>{
             this.changingState = true;
-        }, 11000)
+        }, 1000)
         setTimeout(()=>{
             this.changingState = false;
             this.changingState2 = true
-        }, 13500)
+        }, 3500)
         setTimeout(()=>{
             this.changingState2 = false;
             this.changingState3 = true
-        }, 17500)
+        }, 7500)
 
         setTimeout(()=>{
             this.changingState3 = false;
             this.changingState2 = true
-        }, 20000)
+        }, 9000)
         setTimeout(()=>{
-            this.changingState4 = false;
-            this.changingState = true
-        }, 24000)
+            this.changingState2 = false;
+            this.changingState4 = true
+        }, 11000)
        this.beat = this.audio.createBeat(4, () => {console.log('Beat!')})
         this.beat.on()
         this.audio._load(flume, () => {
@@ -140,15 +164,24 @@ export default class App {
         }
 
         for(var i = 0; i < 100000; i++){
-            var pyramidPosition = new THREE.Vector3()
-            this.theta = Math.random()*(Math.PI*2)
-            pyramidPosition.x = Math.random()*1000-500
-            pyramidPosition.y = Math.random()*1000-500
-            pyramidPosition.z = Math.random()*1000-500
+            var tearPosition = new THREE.Vector3()
+            // this.alpha = Math.random()*(Math.PI*2)-(Math.random()*Math.PI*2)
+            // this.theta = Math.random()*(Math.PI)-(Math.random()*Math.PI*2)
+            // pyramidPosition.x = Math.pow(Math.cos(this.alpha)*Math.cos(this.theta), 3)
+            // pyramidPosition.y = Math.pow(Math.sin(this.alpha)*Math.cos(this.theta), 3)
+            // pyramidPosition.z = Math.pow(Math.sin(this.theta), 3)
 
-            this.pyramidArr.push(pyramidPosition)
+            this.alpha =Math.random()*2*Math.PI;
+            this.theta = Math.random()*Math.PI;
+    
+            tearPosition.x = 0.7*(Math.cos(this.theta)*Math.sin(this.theta)*Math.cos(this.alpha))*2;
+            tearPosition.y = -Math.sin(this.theta)*2+1;
+            tearPosition.z = 0.7*(Math.cos(this.theta)*Math.sin(this.theta)*Math.sin(this.alpha))*2;
+
+            this.tearArr.push(tearPosition)
+
         }
-        console.log(this.cubeArr[0].x)
+        //console.log(this.cubeArr[0].x)
             
 
         var uniforms = {
@@ -199,6 +232,8 @@ export default class App {
     
 
     render() {
+
+        this.kickTempo += 1
         this.time += 0.01;
         var now = Date.now();
         this.animEnter.timepast += now - this.animEnter.last;
@@ -231,7 +266,7 @@ export default class App {
     this.starsGeometry.verticesNeedUpdate = true
 
         if(this.changingState){
-            console.log('cube')
+            //console.log('cube')
             for(var i=0; i< 100000; i++){
                 
                 this.currArr[i].x += (this.cubeArr[i].x - this.currArr[i].x) * 0.05
@@ -242,7 +277,7 @@ export default class App {
         }
 
         if(this.changingState2){
-            console.log('sphere')
+            //console.log('sphere')
             for(var i=0; i< 100000; i++){
 
                 this.currArr[i].x += (this.starArr[i].x - this.currArr[i].x) * 0.05
@@ -252,7 +287,7 @@ export default class App {
         }
 
         if(this.changingState3){
-            console.log('torus')
+            //console.log('torus')
             for(var i=0; i< 100000; i++){
                 this.currArr[i].x += (this.torusArr[i].x - this.currArr[i].x) * 0.05
                 this.currArr[i].y += (this.torusArr[i].y - this.currArr[i].y) * 0.05
@@ -261,20 +296,20 @@ export default class App {
         }
 
         if(this.changingState4){
-            console.log('pyramid')
+            //console.log('tear')
             for(var i=0; i< 100000; i++){
-                this.currArr[i].x += (this.pyramidArr[i].x - this.currArr[i].x) * 0.05
-                this.currArr[i].y += (this.pyramidArr[i].y - this.currArr[i].y) * 0.05
-                this.currArr[i].z += (this.pyramidArr[i].z - this.currArr[i].z) * 0.05
+                this.currArr[i].x += (this.tearArr[i].x - this.currArr[i].x) * 0.05
+                this.currArr[i].y += (this.tearArr[i].y - this.currArr[i].y) * 0.05
+                this.currArr[i].z += (this.tearArr[i].z - this.currArr[i].z) * 0.05
             }
         }
 
         if(this.audio.getSpectrum()[0] > 2) {
             this.camera.z += 0.1
         }
-        this.camera.position.x = this.starField.position.x + 200 * Math.cos( this.time*2 );         
-        this.camera.position.y = this.starField.position.z + 200 * Math.sin( this.time*2 );
-        this.camera.position.z = this.starField.position.z + 200 * Math.sin( this.time );
+        this.camera.position.x = this.starField.position.x + 200 * Math.cos( this.time*this.speed );         
+        this.camera.position.y = this.starField.position.z + 200 * Math.sin( this.time*this.speed);
+        this.camera.position.z = this.starField.position.z + 200 * Math.sin( this.time*this.speed );
         this.camera.lookAt( this.starField.position );
 
         this.renderer.render( this.scene, this.camera );
