@@ -23,8 +23,8 @@ import Tear from './shapes/tear'
 import Torus from './shapes/torus'
 import Particles from './shapes/particles'
 
-
-
+// import tween
+import {TweenMax, Power2, TimelineLite} from 'gsap'
 export default class App {
 
     constructor() {
@@ -52,10 +52,26 @@ export default class App {
         var axisHelper = new THREE.AxisHelper( 50 )
 
         //Audio
-        this.audio = new Sound( Audio, 102, .3, null, false )
+        this.audio = new Sound( Audio, 103, .3, null, false )
         this.audio._load(Audio, () => {
             this.audio.play()
         });
+
+        console.log(this.audio.between()) 
+
+        this.audio.between('Test', 37, 46, () => {
+            document.querySelector('body').style.background = '#D66D75'
+        })
+        this.audio.after('Test', 46, ()=> {
+            document.querySelector('body').style.background = '#1a1a1a'
+        })
+        
+        this.audio.between('Test', 121, 129.5, () => {
+            document.querySelector('body').style.background = '#D66D75'
+        })
+        this.audio.after('Test', 129.5, ()=> {
+            document.querySelector('body').style.background = '#1a1a1a'
+        })
 
         //Beat check
         this.beat = this.audio.createBeat(4, () => {console.log('Beat!')})
@@ -148,6 +164,10 @@ export default class App {
          } );
 
         this.particlesField = new THREE.Points(this.initial.initialGeometry , this.particlesMaterial );
+
+        this.audio.between('Test', 37, 46, () => {
+            
+        })
         this.scene.add( this.particlesField );
 
     	this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
@@ -170,6 +190,8 @@ export default class App {
             }
             
     }
+
+
 
     getNewPattern() {
         let nextPatterns = this.states.filter((state) => {
