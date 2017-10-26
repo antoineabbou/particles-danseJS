@@ -26,6 +26,7 @@ export default class App {
         this.starArr = []
         this.currArr = []
         this.torusArr = []
+        this.pyramidArr = []
         
         this.kick = this.audio.createKick({
           decay: 5,
@@ -45,6 +46,7 @@ export default class App {
         this.changingState = false;
         this.changingState2 = false;
         this.changingState3 = false;
+        this.changingState4 = false;
         setTimeout(() =>{
             this.changingState = true;
         }, 11000)
@@ -57,6 +59,14 @@ export default class App {
             this.changingState3 = true
         }, 17500)
 
+        setTimeout(()=>{
+            this.changingState3 = false;
+            this.changingState2 = true
+        }, 20000)
+        setTimeout(()=>{
+            this.changingState4 = false;
+            this.changingState = true
+        }, 24000)
        this.beat = this.audio.createBeat(4, () => {console.log('Beat!')})
         this.beat.on()
         this.audio._load(flume, () => {
@@ -129,7 +139,15 @@ export default class App {
             this.torusArr.push(torusPosition)
         }
 
+        for(var i = 0; i < 100000; i++){
+            var pyramidPosition = new THREE.Vector3()
+            this.theta = Math.random()*(Math.PI*2)
+            pyramidPosition.x = Math.random()*1000-500
+            pyramidPosition.y = Math.random()*1000-500
+            pyramidPosition.z = Math.random()*1000-500
 
+            this.pyramidArr.push(pyramidPosition)
+        }
         console.log(this.cubeArr[0].x)
             
 
@@ -242,6 +260,14 @@ export default class App {
             }
         }
 
+        if(this.changingState4){
+            console.log('pyramid')
+            for(var i=0; i< 100000; i++){
+                this.currArr[i].x += (this.pyramidArr[i].x - this.currArr[i].x) * 0.05
+                this.currArr[i].y += (this.pyramidArr[i].y - this.currArr[i].y) * 0.05
+                this.currArr[i].z += (this.pyramidArr[i].z - this.currArr[i].z) * 0.05
+            }
+        }
 
         if(this.audio.getSpectrum()[0] > 2) {
             this.camera.z += 0.1
