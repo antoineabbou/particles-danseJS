@@ -1,4 +1,5 @@
 uniform float u_time;
+uniform float u_frequency;
 
 vec3 colorA = vec3(0.81,0.30,0.67);
 vec3 colorB = vec3(0.51,0.44,0.64);
@@ -97,5 +98,8 @@ void main() {
   color = mix(colorA, colorB, pct); 
 
   gl_FragColor = vec4(color,0.1);
+
+  // float color = snoise(vec3(u_time/u_frequency/4.));
+	// gl_FragColor = vec4(color/.5, color, color, 1.0);
   
 }

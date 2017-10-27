@@ -7,8 +7,23 @@
 
 //import Utils
 import OrbitControls from 'imports-loader?THREE=three!exports-loader?THREE.OrbitControls!three/examples/js/controls/OrbitControls' 
+import EffectComposer from 'imports-loader?THREE=three!exports-loader?THREE.EffectComposer!three/examples/js/postprocessing/EffectComposer' 
+import RenderPass from 'imports-loader?THREE=three!exports-loader?THREE.RenderPass!three/examples/js/postprocessing/RenderPass'
+import MaskPass from 'imports-loader?THREE=three!exports-loader?THREE.MaskPass!three/examples/js/postprocessing/MaskPass'
+import ShaderPass from 'imports-loader?THREE=three!exports-loader?THREE.ShaderPass!three/examples/js/postprocessing/ShaderPass'
+import GlitchPass from 'imports-loader?THREE=three!exports-loader?THREE.GlitchPass!three/examples/js/postprocessing/GlitchPass'
+import UnrealBloomPass from 'imports-loader?THREE=three!exports-loader?THREE.UnrealBloomPass!three/examples/js/postprocessing/UnrealBloomPass' // eslint-disable-line
+
+
+import FXAAShader from 'imports-loader?THREE=three!exports-loader?THREE.FXAAShader!three/examples/js/shaders/FXAAShader' // eslint-disable-line
+import CopyShader from 'imports-loader?THREE=three!exports-loader?THREE.CopyShader!three/examples/js/shaders/CopyShader'
+import DigitalGlitch from 'imports-loader?THREE=three!exports-loader?THREE.DigitalGlitch!three/examples/js/shaders/DigitalGlitch'
+import ConvolutionShader from 'imports-loader?THREE=three!exports-loader?THREE.ConvolutionShader!three/examples/js/shaders/ConvolutionShader' // eslint-disable-line
+import LuminosityHighPassShader from 'imports-loader?THREE=three!exports-loader?THREE.LuminosityHighPassShader!three/examples/js/shaders/LuminosityHighPassShader' // eslint-disable-line
+
 import Sound from './utils/Sound'
-import Audio from '../assets/audio/gramatik.mp3'
+import Audio from '../assets/audio/gramatik.mp3' 
+import Colors from './utils/Colors'
 
 //import Shaders 
 import vertParticles from './glsl/shaders/particles/particles.vert'
@@ -40,6 +55,7 @@ export default class App {
         
         //Controls
         this.controls = new OrbitControls(this.camera)
+        
 
         //Scene
         this.scene = new THREE.Scene();
@@ -47,9 +63,14 @@ export default class App {
         this.resolutionX = window.innerWidth
         this.resolutionY = window.innerHeight
         this.resolutionZ = 10000
+        
 
         //Axis Helper
         var axisHelper = new THREE.AxisHelper( 50 )
+        //this.scene.add(axisHelper)
+
+        //Colors
+        this.colors = new Colors
 
         //Audio
         this.audio = new Sound( Audio, 103, .3, null, false )
@@ -57,24 +78,46 @@ export default class App {
             this.audio.play()
         });
 
-        console.log(this.audio.between()) 
+        //console.log(this.audio.between()) 
+        this.bass = this.audio.createKick({
+            frequency: 3,
+            decay:1,
+            threshold: 255,
+            onKick: () => {
+               if(this.kickTempo > 10){
+                    this.kickTempo = 0
+                    document.querySelector('body').style.background = this.colors.getNewColor()
+                    this.glitchPass.renderToScreen = true;
+                }
+            }
+        }) 
 
-        this.audio.between('Test', 37, 46, () => {
-            document.querySelector('body').style.background = '#D66D75'
+
+        this.audio.between('firstDrop', 37, 46, () => {
+            //document.querySelector('body').style.background = '#D66D75'
+            this.bass.on()
         })
-        this.audio.after('Test', 46, ()=> {
+        this.audio.between('chillOut', 46, 121, ()=> {
+            this.bass.off()
             document.querySelector('body').style.background = '#1a1a1a'
+            this.glitchPass.renderToScreen = false;
+
         })
         
-        this.audio.between('Test', 121, 129.5, () => {
-            document.querySelector('body').style.background = '#D66D75'
+        this.audio.between('secondDrop', 121, 129.5, () => {
+            this.bass.on();
         })
-        this.audio.after('Test', 129.5, ()=> {
+        this.audio.after('secondDrop', 129.5, ()=> {
+            this.bass.off()
             document.querySelector('body').style.background = '#1a1a1a'
+            this.glitchPass.renderToScreen = false;
         })
+        
 
         //Beat check
-        this.beat = this.audio.createBeat(4, () => {console.log('Beat!')})
+        this.beat = this.audio.createBeat(4, () => {
+            //console.log('Beat!')
+        })
         this.beat.on()
 
         //Kick check
@@ -96,6 +139,11 @@ export default class App {
         }) 
         this.kick.on()
         this.kickTempo = 0;
+
+        //End of the sound 
+        this.audio.onceAt('end', 228.3, () => {
+            this.audio.pause()
+        })
 
         //particles / points stuff
         this.nbParticles = 80000
@@ -165,20 +213,55 @@ export default class App {
 
         this.particlesField = new THREE.Points(this.initial.initialGeometry , this.particlesMaterial );
 
-        this.audio.between('Test', 37, 46, () => {
-            
-        })
         this.scene.add( this.particlesField );
+        this.scene.fog = new THREE.Fog( 0x000000, 0.1, this.resolutionZ );
 
     	this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
     	this.renderer.setPixelRatio( window.devicePixelRatio );
     	this.renderer.setSize( window.innerWidth, window.innerHeight );
-    	this.container.appendChild( this.renderer.domElement );
+        this.container.appendChild( this.renderer.domElement );
+        
+
+        this.initPostProcessing()
 
     	window.addEventListener('resize', this.onWindowResize.bind(this), false);
         this.onWindowResize();
 
         this.renderer.animate( this.render.bind(this) );
+    }
+
+    initPostProcessing() {
+        this.composer = new EffectComposer( this.renderer );
+        this.composer.setSize( window.innerWidth, window.innerHeight );        
+        this.renderScene = new RenderPass(this.scene, this.camera);
+        this.copyShader = new ShaderPass(THREE.CopyShader);
+     
+
+        this.composer.addPass( new RenderPass( this.scene, this.camera ) );
+        this.glitchPass = new GlitchPass();
+        this.composer.addPass( this.glitchPass );
+
+
+        
+
+
+        // this.composer.addPass(this.renderScene);
+        // this.composer.addPass(this.effectFXAA);
+        // this.composer.addPass(this.bloomPass);
+        // this.composer.addPass(this.copyShader); 
+
+        //console.log(this.composer)
+        //console.log(this.glitchPass)
+
+
+        //Create Shader Passes
+        
+        
+        //Add Shader Passes to Composer - order is important
+        
+        //set last pass in composer chain to renderToScreen
+        this.copyShader.renderToScreen = true;
+
     }
     
     displacement() {
@@ -190,8 +273,6 @@ export default class App {
             }
             
     }
-
-
 
     getNewPattern() {
         let nextPatterns = this.states.filter((state) => {
@@ -222,7 +303,9 @@ export default class App {
 
         this.kickTempo += 1
         this.time += 0.01;
-    
+
+        
+        
 
         this.particlesMaterial.uniforms.u_time.value = this.time;
         this.particlesMaterial.uniforms.u_frequency.value = 1
@@ -242,6 +325,7 @@ export default class App {
         this.camera.lookAt( this.particlesField.position );
 
         this.renderer.render( this.scene, this.camera );
+        this.composer.render();
         
     }
 
