@@ -34,7 +34,6 @@ export default class App {
         //Controls
         this.controls = new OrbitControls(this.camera.pov)
         
-
         //Scene
         this.scene = new THREE.Scene();
         this.time = 0
@@ -43,9 +42,6 @@ export default class App {
         this.resolutionY = window.innerHeight
         this.resolutionZ = 10000
 
-        //Axis Helper
-        var axisHelper = new THREE.AxisHelper( 50 )
-        //this.scene.add(axisHelper)
 
         //Renderer 
         this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
@@ -59,35 +55,44 @@ export default class App {
 
         this.renderer.animate( this.render.bind(this) );
 
-        //Colors
+        //Utils stuff instanciation
         this.colors = new Colors
-
         this.stateManager = new StateManager()
-        this.animation = new Animations()
+        this.animations = new Animations()
         
+
+        //Postprocessing
         this.initPostProcessing()
+        
+        //Audio
         this.audioManager()
 
-        //particles / points stuff
+        //particles / points
         this.nbParticles = 20000
         this.nbPoints = 100
-        this.initialRatio = 0.0055
-        this.ratio = 0.05
 
+        //Ratio - Speed of particles when changing
+        this.initialRatio = 0.0055 
+        this.ratio = 0.05
         
+        //Instances of white particles
+        this.particles = new Particles(this.nbPoints)
+        for(var i = 0; i < this.nbPoints; i++){
+            this.scene.add(this.particles.particles[i]);
+        }
+
         //instance of the first shape 
         this.initial = new Initial(this.nbParticles)
 
-        //instances of shapes
+        //instances of other shapes
         this.cube = new Cube(this.nbParticles);
         this.octa = new Octa(this.nbParticles)
         this.sphere = new Sphere(this.nbParticles)
         this.tear = new Tear(this.nbParticles)
         this.torus = new Torus(this.nbParticles)
-        this.particles = new Particles(this.nbPoints)
-
-        //States Manager
         
+
+        //We are putting all the shapes in an array to manage it later
         this.states = []
         this.cubeState = {
             type : 'cube', 
@@ -115,13 +120,12 @@ export default class App {
             data: this.torus
         }
         this.states.push(this.cubeState, this.octaState, this.sphereState, this.tearState, this.torusState)
+
+        //First pattern is the sphere
         this.currentPattern = {type: "sphere", isActive: true, data: this.sphere}
         
 
-        //Instances of white particles
-        for(var i = 0; i < this.nbPoints; i++){
-            this.scene.add(this.particles.particles[i]);
-        }
+        //Particles instanciation 
 
         var uniforms = {
             u_time: { type: "f", value: 1.0 },
@@ -137,37 +141,26 @@ export default class App {
          } );
 
         this.particlesField = new THREE.Points(this.initial.initialGeometry , this.particlesMaterial );
-
         this.scene.add( this.particlesField );
         
         
-         
-
-    	
-
-
-
-        this.animation.firstAnimation()
-
-        
-
-
-        
+        // Launching first animation 
+        this.animations.firstAnimation()
     }
 
     initPostProcessing() {
         this.glitchMode = new Glitch(this.renderer, this.scene, this.camera.pov)
     }
 
-    checkPattern(){
-        
+    checkPattern(){ // Check if torus or sphere, if it's the case, shape is noisy
         if((this.changingState) && ((this.currentPattern.type == 'sphere') || (this.currentPattern.type == 'torus'))){
             this.particlesMaterial.uniforms.u_frequency.value = this.audio.arrAverage(this.audio.getSpectrum())/5
         }
     }
 
-    audioManager() {
+    audioManager() { //AudioManager instanciation
         var button = document.querySelector('.btn')
+        this.kickTempo = 0;
 
         this.audio = new Sound(Audio, 103, .3, () => {
             this.audio._load(Audio, () => {
@@ -177,18 +170,6 @@ export default class App {
             });
         }, false);
 
-        this.bass = this.audio.createKick({
-            frequency: 3,
-            decay:1,
-            threshold: 255,
-            onKick: () => {
-               if(this.kickTempo > 10){
-                    this.kickTempo = 0
-                    document.querySelector('canvas').style.background = this.colors.getNewColor()
-                    this.glitchMode.glitchPass.renderToScreen = true;
-                }
-            }
-        }) 
 
         this.audio.between('first movement', 0, 18.5, () => {
             this.stateManager.displacement(this.nbParticles, this.sphereState.data.points, this.initial.points, this.initialRatio)
@@ -213,6 +194,25 @@ export default class App {
             this.glitchMode.glitchPass.renderToScreen = false;
         })
 
+        //End of the sound 
+        this.audio.onceAt('end', 225.3, () => {
+            this.audio.pause()
+            this.animations.finalAnimation()  
+        })
+
+        //Bass check
+        this.bass = this.audio.createKick({
+            frequency: 3,
+            decay:1,
+            threshold: 255,
+            onKick: () => {
+               if(this.kickTempo > 10){
+                    this.kickTempo = 0
+                    document.querySelector('canvas').style.background = this.colors.getNewColor()
+                    this.glitchMode.glitchPass.renderToScreen = true;
+                }
+            }
+        }) 
         
 
         //Kick check
@@ -233,13 +233,6 @@ export default class App {
             }
         }) 
         this.kick.on()
-        this.kickTempo = 0;
-
-        //End of the sound 
-        this.audio.onceAt('end', 225.3, () => {
-            this.audio.pause()
-            this.animation.finalAnimation()  
-        })
     }
     
 
@@ -250,24 +243,25 @@ export default class App {
 
         this.particlesMaterial.uniforms.u_time.value = this.time;
         this.particlesMaterial.uniforms.u_frequency.value = 1
-        this.checkPattern()
-        this.particles.moveParticles()        
+
+        this.checkPattern() 
+        this.particles.moveParticles() //White particles constantly move       
 
         this.initial.initialGeometry.verticesNeedUpdate = true
 
-        if(this.changingState){
+        if(this.changingState){ //If we are on a kick then we change shapes this way :
             this.stateManager.displacement(this.nbParticles, this.currentPattern.data.points, this.initial.points, this.ratio)
         }
 
-        this.camera.rotate(this.particlesField.position, this.distance, this.time )
+        this.camera.rotate(this.particlesField.position, this.distance, this.time ) //Constantly rotate around the shape
 
         this.renderer.render( this.scene, this.camera.pov );
-        this.glitchMode.composer.render();
+
+        this.glitchMode.composer.render(); //Glitch mode on drop
         
     }
 
-    onWindowResize() {
-
+    onWindowResize() { //Resize stuff
     	this.camera.pov.aspect = window.innerWidth / window.innerHeight;
     	this.camera.pov.updateProjectionMatrix();
     	this.renderer.setSize( window.innerWidth, window.innerHeight );

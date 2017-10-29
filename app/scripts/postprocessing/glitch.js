@@ -8,7 +8,9 @@ import CopyShader from 'imports-loader?THREE=three!exports-loader?THREE.CopyShad
 import DigitalGlitch from 'imports-loader?THREE=three!exports-loader?THREE.DigitalGlitch!three/examples/js/shaders/DigitalGlitch'
 
 export default class Glitch {
+
     constructor (renderer, scene, camera){
+
         this.composer = new EffectComposer( renderer );
         this.composer.setSize( window.innerWidth, window.innerHeight );        
         this.renderScene = new RenderPass(scene, camera);
@@ -18,5 +20,6 @@ export default class Glitch {
         this.glitchPass = new GlitchPass();
         this.composer.addPass( this.glitchPass );
         this.copyShader.renderToScreen = true;
+        
     }
 }
