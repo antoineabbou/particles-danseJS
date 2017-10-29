@@ -210,7 +210,7 @@ export default class Sound {
                 return _this.time > time && !this.called;
             },
             callback : function () {
-                console.log('once :', thisSection.label)
+                //console.log('once :', thisSection.label)
                 callback.call( this );
                 thisSection.called = true;
             },
