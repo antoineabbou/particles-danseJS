@@ -324,7 +324,8 @@ export default class Sound {
 
     onEnded() {
 
-        this.stop();
+        //this.stop();
+        console.log('fin')
     }
 };
 

@@ -23,17 +23,17 @@ img{
 
 .song {
     color:white;
-    left:72px;
-    top:48px;
+    left:24px;
+    top:24px;
     display:flex;
     position: absolute;
     z-index: 1;
     height: 35px;
+    opacity: 0;
 }
 
 .song p {
     font-size: 12px;
-    margin-left: 20px;
     line-height: 12px;
     letter-spacing: 1.5px;
     font-family: 'Open Sans', sans-serif;
@@ -56,4 +56,271 @@ a {
 a:focus {
     outline:none;
     color:white;
+}
+
+
+body, html
+{
+    margin : 0; padding: 0; overflow: hidden;
+    
+}
+
+#wrapper, #end-wrapper{
+    display: flex;
+    height: 100vh;
+    align-items: center;
+}
+#end-wrapper {
+    display:none;
+}
+#container, #end-container{
+    background: white;
+    width:0%;
+    height:0.5px;
+    align-self: center;
+    margin:auto;
+}
+.content, .end-content{
+    height:100%;
+    align-items: center;
+    position:relative;
+    box-shadow: 6px 5px 30px -4px rgba(0,0,0,0.85);    
+}
+
+.end-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: black;
+    font-size : 85px;
+    text-align: center;
+    margin:auto;
+    letter-spacing: 4px;
+    position:absolute;
+    left:0; right:0;
+    top:47%;
+    opacity:0
+}
+
+h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: black;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    font-size : 64px;
+    text-align: center;
+    margin:auto;
+    letter-spacing: 4px;
+    position:absolute;
+    left:0; right:0;
+    top:45%;
+    opacity:0;
+}
+
+
+
+h3 {
+    font-family: 'Open sans', sans-serif;
+    color: #1a1a1a;
+    font-size : 16px;
+    text-align: center;
+    margin:auto;
+    letter-spacing: 1.2px;
+    position:absolute;
+    left:0; right:0;
+    top:47%;
+    opacity:0;
+}
+
+h5 {
+    font-family: 'Open sans', sans-serif;
+    color: #1a1a1a;
+    font-size : 13px;
+    text-align: center;
+    margin:auto;
+    letter-spacing: 1px;
+    position:absolute;
+    left:0; right:0;
+    top:53.5%;
+    opacity:0;
+}
+
+ul {
+    list-style-type: none;
+    display:flex;
+    margin:auto;
+    position:absolute;
+    bottom:40px;
+    width:246px;
+    left:0; right:0;
+}
+.social{
+    width: 30px;
+    margin: 0px 20px
+}
+
+.second-part {
+    font-family: 'Open sans', sans-serif;
+}
+
+p.author {
+    position:absolute;
+    bottom:24px;
+    width:100%;
+    text-align: center;
+    left:0; right:0;
+    margin:0 auto; padding:0;
+    opacity: 0;
+}
+
+.github {
+    position:absolute;
+    color:white; 
+    bottom: 24px; 
+    width:100%;
+    text-align: center;
+    left:0; right:0; 
+    margin: 0 auto; padding:0;
+    opacity:0; 
+}
+
+.second-part a {
+    color: #1a1a1a;
+}
+
+
+ 
+  a.btn {
+    opacity:0;
+    position: fixed;
+    cursor: pointer;
+    font-family: 'Open-sans', sans-serif;
+    top: 46vh;
+    left: 50%;
+    color: white;
+    transform: translate3d(-50%, -50%, 0);
+    padding: 1em calc(0.7em * 1.2);
+    display: inline-block;
+    border: 2px solid transparent;
+    position: relative;
+    font-size: 18px;
+    letter-spacing: 2.5px;
+  }
+  a.btn .text {
+    
+    color:#1a1a1a;
+    display: block;
+    transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1) 0.4s;
+  }
+  a.btn:after {
+    position: absolute;
+    content: '';
+    bottom: -2px;
+    left: calc(0.7em * 1.2);
+    right: calc(0.7em * 1.2);
+    height: 2px;
+    background: #1a1a1a;
+    z-index: -1;
+    transition: transform 0.8s cubic-bezier(1, 0, 0.37, 1) 0.2s, right 0.2s cubic-bezier(0.04, 0.48, 0, 1) 0.6s, left 0.4s cubic-bezier(0.04, 0.48, 0, 1) 0.6s;
+    transform-origin: left;
+  }
+  
+  .line {
+    position: absolute;
+    background: #1a1a1a;
+  }
+  .line.-right, .line.-left {
+    width: 2px;
+    bottom: -2px;
+    top: -2px;
+    transform: scale3d(1, 0, 1);
+  }
+  .line.-top, .line.-bottom {
+    height: 2px;
+    left: -2px;
+    right: -2px;
+    transform: scale3d(0, 1, 1);
+  }
+  .line.-right {
+    right: -2px;
+    transition: transform 0.1s cubic-bezier(1, 0, 0.65, 1.01) 0.23s;
+    transform-origin: top;
+  }
+  .line.-top {
+    top: -2px;
+    transition: transform 0.08s linear 0.43s;
+    transform-origin: left;
+  }
+  .line.-left {
+    left: -2px;
+    transition: transform 0.08s linear 0.51s;
+    transform-origin: bottom;
+  }
+  .line.-bottom {
+    bottom: -2px;
+    transition: transform 0.3s cubic-bezier(1, 0, 0.65, 1.01);
+    transform-origin: right;
+  }
+  
+  a.btn:hover .text,
+  a.btn:active .text {
+    transform: translate3d(0, 0, 0);
+    transition: transform 0.6s cubic-bezier(0.2, 0, 0, 1) 0.4s;
+  }
+  a.btn:hover:after,
+  a.btn:active:after {
+    transform: scale3d(0, 1, 1);
+    right: -2px;
+    left: -2px;
+    transform-origin: right;
+    transition: transform 0.2s cubic-bezier(1, 0, 0.65, 1.01) 0.17s, right 0.2s cubic-bezier(1, 0, 0.65, 1.01), left 0s 0.3s;
+  }
+  a.btn:hover .line,
+  a.btn:active .line {
+    transform: scale3d(1, 1, 1);
+  }
+  a.btn:hover .line.-right,
+  a.btn:active .line.-right {
+    transition: transform 0.1s cubic-bezier(1, 0, 0.65, 1.01) 0.2s;
+    transform-origin: bottom;
+  }
+  a:hover .line.-top,
+  a:active .line.-top {
+    transition: transform 0.08s linear 0.4s;
+    transform-origin: right;
+  }
+  a.btn:hover .line.-left,
+  a.btn:active .line.-left {
+    transition: transform 0.08s linear 0.48s;
+    transform-origin: top;
+  }
+  a.btn:hover .line.-bottom,
+  a.btn:active .line.-bottom {
+    transition: transform 0.5s cubic-bezier(0, 0.53, 0.29, 1) 0.56s;
+    transform-origin: left;
+  }
+  
+
+.end-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: black;
+    font-size : 85px;
+    text-align: center;
+    margin:auto;
+    letter-spacing: 4px;
+    position:absolute;
+    left:0; right:0;
+    top:47%;
+    opacity:0
+}
+ul {
+    list-style-type: none;
+    display:flex;
+    margin:auto;
+    position:absolute;
+    bottom:40px;
+    width:246px;
+    left:0; right:0;
+}
+.social{
+    width: 30px;
+    margin: 0px 20px
 }

@@ -21,6 +21,7 @@ import DigitalGlitch from 'imports-loader?THREE=three!exports-loader?THREE.Digit
 import ConvolutionShader from 'imports-loader?THREE=three!exports-loader?THREE.ConvolutionShader!three/examples/js/shaders/ConvolutionShader' // eslint-disable-line
 import LuminosityHighPassShader from 'imports-loader?THREE=three!exports-loader?THREE.LuminosityHighPassShader!three/examples/js/shaders/LuminosityHighPassShader' // eslint-disable-line
 
+
 import Sound from './utils/Sound'
 import Audio from '../assets/audio/gramatik.mp3' 
 import Colors from './utils/Colors'
@@ -37,9 +38,12 @@ import Sphere from './shapes/sphere'
 import Tear from './shapes/tear'
 import Torus from './shapes/torus'
 import Particles from './shapes/particles'
+import Final from './shapes/final'
+
 
 // import tween
 import {TweenMax, Power2, TimelineLite} from 'gsap'
+
 export default class App {
 
     constructor() {
@@ -63,7 +67,6 @@ export default class App {
         this.resolutionX = window.innerWidth
         this.resolutionY = window.innerHeight
         this.resolutionZ = 10000
-        
 
         //Axis Helper
         var axisHelper = new THREE.AxisHelper( 50 )
@@ -77,6 +80,9 @@ export default class App {
         this.audio._load(Audio, () => {
             this.audio.play()
         });
+
+        
+        
 
         //console.log(this.audio.between()) 
         this.bass = this.audio.createKick({
@@ -107,11 +113,28 @@ export default class App {
         this.audio.between('secondDrop', 121, 129.5, () => {
             this.bass.on();
         })
-        this.audio.after('secondDrop', 129.5, ()=> {
+        this.audio.between('secondDrop', 129.5, 205.5, ()=> {
             this.bass.off()
             document.querySelector('body').style.background = '#1a1a1a'
             this.glitchPass.renderToScreen = false;
         })
+
+        this.audio.between('first movement', 0, 18.5, () => {
+            for(var i=0; i< this.nbParticles; i++){
+                this.initial.points[i].x += (this.sphereState.data.points[i].x - this.initial.points[i].x) * 0.0055
+                this.initial.points[i].y += (this.sphereState.data.points[i].y - this.initial.points[i].y) * 0.0055
+                this.initial.points[i].z += (this.sphereState.data.points[i].z - this.initial.points[i].z) * 0.0055
+                    
+            }
+        }) 
+
+        // this.audio.after('final', 18.5, ()=> {
+        //     this.initial.points[i].x += (this.final.points[i].x - this.initial.points[i].x) * 0.9
+        //     this.initial.points[i].y += (this.final.points[i].y - this.initial.points[i].y) * 0.9
+        //     this.initial.points[i].z += (this.final.points[i].z - this.initial.points[i].z) * 0.9
+        //     console.log('final', this.final.points[0].x)
+        //     console.log('initial', this.initial.points[0].x)
+        // })
         
 
         //Beat check
@@ -143,11 +166,19 @@ export default class App {
         //End of the sound 
         this.audio.onceAt('end', 228.3, () => {
             this.audio.pause()
+            tl.to(song, 1, {opacity:0})
+            tl.to(github, 1, {opacity:0}, '-=1')
+            endWrapper.style.display = 'flex'
+            endContainer.style.display = 'block'        
+            endTl.to(endContainer, 1, {width:'96%',ease: Expo.easeOut}, '+=1')
+            endTl.to(endContainer, 1, {height:'93%',ease: Expo.easeOut})
+            endTl.to(endTitle, 1, {opacity:1, y:-40, ease:Power4.easeOut})
+            endTl.staggerFrom(".social", 1.5, {scale:0.5, opacity:0, ease:Elastic.easeOut, force3D:true}, 0.2)    
         })
 
         //particles / points stuff
-        this.nbParticles = 80000
-        this.nbPoints = 100
+        this.nbParticles = 60000
+        this.nbPoints = 50
         this.ratio = 0.05
 
         
@@ -161,6 +192,9 @@ export default class App {
         this.tear = new Tear(this.nbParticles)
         this.torus = new Torus(this.nbParticles)
         this.particles = new Particles(this.nbPoints)
+
+        //instance of the final shape 
+        this.final = new Final(this.nbParticles)
 
         //States Manager
         
@@ -214,7 +248,8 @@ export default class App {
         this.particlesField = new THREE.Points(this.initial.initialGeometry , this.particlesMaterial );
 
         this.scene.add( this.particlesField );
-        this.scene.fog = new THREE.Fog( 0x000000, 0.1, this.resolutionZ );
+        
+         
 
     	this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
     	this.renderer.setPixelRatio( window.devicePixelRatio );
@@ -228,6 +263,51 @@ export default class App {
         this.onWindowResize();
 
         this.renderer.animate( this.render.bind(this) );
+
+
+
+
+
+
+        var wrapper = document.getElementById('wrapper')
+        var container = document.getElementById('container')
+        var title = document.querySelector('.title')
+        var subtitle = document.querySelector('h3')
+        var description = document.querySelector('h5')
+        var subtitles = document.querySelector('.first-part')
+        var author = document.querySelector('.author')
+        var button = document.querySelector('.btn')
+        var song = document.querySelector('.song')
+        var github = document.querySelector('.github')
+        var tl = new TimelineMax();
+        tl.to(container, 1, {width:'96%',ease: Expo.easeOut}, '+=1')
+        tl.to(container, 1, {height:'93%',ease: Expo.easeOut})
+        tl.to(title, 1, {opacity:1, y:'-90', ease: Expo.easeOut})
+        tl.to(subtitle, 1, {opacity:1, ease: Expo.easeOut})
+        tl.to(description, 1.2, {opacity:1, ease: Expo.easeOut})
+        tl.to(subtitles, 0.7, {opacity:0, ease: Expo.easeOut}, '+=0.8')
+        tl.to(author, 1.5, {opacity:1, ease: Expo.easeOut})
+        tl.to(button, 1.5, {opacity:1, ease: Expo.easeOut}, '-=1.5')
+
+        button.addEventListener('click', () => {
+            tl.to(author, 1, {opacity:0, ease: Expo.easeOut})
+            tl.to(button, 1, {opacity:0, ease: Expo.easeOut}, '-=1')
+            tl.to(container, 0.75, {height:'0.5px',ease: Expo.easeOut})
+            tl.to(container, 0.75, {width:'0%',ease: Expo.easeOut})
+            setTimeout(()=> {
+                wrapper.style.display = 'none'
+                tl.to(song, 1, {opacity: 1, ease: Expo.easeOut}, '+=1.5')
+                tl.to(github, 1, {opacity: 1, ease: Expo.easeOut}, '-=1')
+            },2700) 
+            
+        })
+       
+        var endWrapper = document.getElementById('end-wrapper')
+        var endContent = document.querySelector(".end-content")
+        var endContainer = document.getElementById("end-container")
+        var endTitle = document.querySelector(".end-title")
+        var endTl = new TimelineMax()
+        
     }
 
     initPostProcessing() {
@@ -240,37 +320,17 @@ export default class App {
         this.composer.addPass( new RenderPass( this.scene, this.camera ) );
         this.glitchPass = new GlitchPass();
         this.composer.addPass( this.glitchPass );
-
-
-        
-
-
-        // this.composer.addPass(this.renderScene);
-        // this.composer.addPass(this.effectFXAA);
-        // this.composer.addPass(this.bloomPass);
-        // this.composer.addPass(this.copyShader); 
-
-        //console.log(this.composer)
-        //console.log(this.glitchPass)
-
-
-        //Create Shader Passes
-        
-        
-        //Add Shader Passes to Composer - order is important
-        
-        //set last pass in composer chain to renderToScreen
         this.copyShader.renderToScreen = true;
 
     }
     
     displacement() {
-            for(var i=0; i< this.nbParticles; i++){
-                
-                this.initial.points[i].x += (this.currentPattern.data.points[i].x - this.initial.points[i].x) * this.ratio
-                this.initial.points[i].y += (this.currentPattern.data.points[i].y - this.initial.points[i].y) * this.ratio
-                this.initial.points[i].z += (this.currentPattern.data.points[i].z - this.initial.points[i].z) * this.ratio
-            }
+        for(var i=0; i< this.nbParticles; i++){
+            
+            this.initial.points[i].x += (this.currentPattern.data.points[i].x - this.initial.points[i].x) * this.ratio
+            this.initial.points[i].y += (this.currentPattern.data.points[i].y - this.initial.points[i].y) * this.ratio
+            this.initial.points[i].z += (this.currentPattern.data.points[i].z - this.initial.points[i].z) * this.ratio
+        }
             
     }
 
