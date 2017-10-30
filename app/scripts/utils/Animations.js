@@ -23,28 +23,18 @@ export default class Animations {
         this.endContainer = document.getElementById("end-container")
         this.endTitle = document.querySelector(".end-title")
 
+        this.loader = document.querySelector('.loader')        
+
         this.tl = new TimelineMax(); 
-        this.endTl = new TimelineMax()
-
-
-        setTimeout(()=>{
-            var body = document.querySelector('body')
-            var btnFS = document.querySelector('.full_screen')
-            btnFS.addEventListener('click', () => {
-                this.requestFullScreen(body)
-            })
-
-            document.addEventListener( 'keydown', (e)=> {
-                if (e.keyCode === 27) {
-                    this.showControls() // esc
-                    console.log('rioezoiru')
-                }
-            });
-        }, 1000)     
+        this.endTl = new TimelineMax()    
 
     }
 
     firstAnimation() {
+        this.tl.to(this.loader, 0.3, {opacity:0})
+        setTimeout(()=>{
+            this.loader.style.display = 'none'
+        },500)
         if(window.innerWidth<=500){
             this.tl.to(this.container, 1, {width:'91%',ease: Expo.easeOut}, '+=1')
             this.tl.to(this.container, 1, {height:'95%',ease: Expo.easeOut})
@@ -76,7 +66,7 @@ export default class Animations {
         this.button.addEventListener('click', () => {
             this.tl.to(this.author, 1, {opacity:0, ease: Expo.easeOut})
             this.tl.to(this.button, 1, {opacity:0, ease: Expo.easeOut}, '-=1')
-            this.tl.to(this.container, 0.75, {height:'0.5px',ease: Expo.easeOut})
+            this.tl.to(this.container, 0.75, {height:'1.5px',ease: Expo.easeOut})
             this.tl.to(this.container, 0.75, {width:'0%',ease: Expo.easeOut})
             setTimeout(()=> {
                 this.wrapper.style.display = 'none'
@@ -95,6 +85,7 @@ export default class Animations {
         this.endWrapper.style.background = '#1a1a1a'
         this.tl.to(this.song, 1, {opacity:0})
         this.tl.to(this.github, 1, {opacity:0}, '-=1')
+        this.tl.to(this.tools, 1, {opacity:0}, '-=1')
         this.endWrapper.style.display = 'flex'
         this.endContainer.style.display = 'block'     
         
@@ -121,28 +112,6 @@ export default class Animations {
         }
         this.endTl.to(this.endTitle, 1, {opacity:1, y:-40, ease:Power4.easeOut})
         this.endTl.staggerFrom(".social", 1.5, {scale:0.5, opacity:0, ease:Elastic.easeOut, force3D:true}, 0.2)  
-    }
-
-    requestFullScreen(element) {
-        // Supports most browsers and their versions.
-        var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
-        var textContent = document.querySelector('.text-content')
-        
-        if (requestMethod) { // Native full screen.
-            requestMethod.call(element);
-        } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
-            var wscript = new ActiveXObject("WScript.Shell");
-            if (wscript !== null) {
-                wscript.SendKeys("{F11}");
-            }
-        }
-
-        this.tools.style.opacity = 0
-        
-    }
-
-    showControls() {
-        this.tools.style.opacity = 1
     }
 
 }
