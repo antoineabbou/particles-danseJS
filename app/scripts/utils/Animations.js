@@ -14,7 +14,10 @@ export default class Animations {
         this.button = document.querySelector('.btn')
         this.song = document.querySelector('.song')
         this.github = document.querySelector('.github')
-            
+        this.tools = document.querySelector('.tools')
+        this.controls = document.querySelector('.controls')
+        this.textContent = document.querySelector('.text-content')
+
         this.endWrapper = document.getElementById('end-wrapper')
         this.endContent = document.querySelector(".end-content")
         this.endContainer = document.getElementById("end-container")
@@ -22,6 +25,22 @@ export default class Animations {
 
         this.tl = new TimelineMax(); 
         this.endTl = new TimelineMax()
+
+
+        setTimeout(()=>{
+            var body = document.querySelector('body')
+            var btnFS = document.querySelector('.full_screen')
+            btnFS.addEventListener('click', () => {
+                this.requestFullScreen(body)
+            })
+
+            document.addEventListener( 'keydown', (e)=> {
+                if (e.keyCode === 27) {
+                    this.showControls() // esc
+                    console.log('rioezoiru')
+                }
+            });
+        }, 1000)     
 
     }
 
@@ -64,6 +83,9 @@ export default class Animations {
                 this.tl.to(this.canvas, 1, {opacity: 1, ease: Expo.easeOut}, '+=0.5')
                 this.tl.to(this.song, 1, {opacity: 1, ease: Expo.easeOut}, '+=1.5')
                 this.tl.to(this.github, 1, {opacity: 1, ease: Expo.easeOut}, '-=1')
+                this.tl.to(this.tools, 1, {opacity: 1, ease: Expo.easeOut}, '-=1')                
+                
+                 
             },2700) 
             
         })
@@ -100,4 +122,27 @@ export default class Animations {
         this.endTl.to(this.endTitle, 1, {opacity:1, y:-40, ease:Power4.easeOut})
         this.endTl.staggerFrom(".social", 1.5, {scale:0.5, opacity:0, ease:Elastic.easeOut, force3D:true}, 0.2)  
     }
+
+    requestFullScreen(element) {
+        // Supports most browsers and their versions.
+        var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
+        var textContent = document.querySelector('.text-content')
+        
+        if (requestMethod) { // Native full screen.
+            requestMethod.call(element);
+        } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+            var wscript = new ActiveXObject("WScript.Shell");
+            if (wscript !== null) {
+                wscript.SendKeys("{F11}");
+            }
+        }
+
+        this.tools.style.opacity = 0
+        
+    }
+
+    showControls() {
+        this.tools.style.opacity = 1
+    }
+
 }

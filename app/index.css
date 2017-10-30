@@ -351,6 +351,45 @@ ul {
     margin: 0px 16px
 }
 
+.full_screen {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    color:white;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size:12px;
+    letter-spacing:1.2px;
+}
+
+.mute .sound_on {
+    width:13px;
+}
+
+.tools {
+    position:absolute;
+    top:84px; 
+    left:24px;
+    opacity:0;
+}
+.controls {    
+    margin-top:32px;
+}
+
+.sound_off, .sound_on{
+    cursor:pointer;
+}
+
+.sound_off{
+    display:none;
+}
+
+.text-content {
+    border: solid 1px white;
+    padding: 10px;
+    display: inline-block;
+    cursor: pointer;
+}
+
 /* Smartphones (portrait and landscape) ----------- */
 @media only screen
 and (min-device-width : 320px)
@@ -392,6 +431,9 @@ and (max-device-width : 767px) {
         text-align: center;
     }
 }
+
+
+
 
 @media only screen and (min-device-width : 767px) {
     .author {

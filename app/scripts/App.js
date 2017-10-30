@@ -24,6 +24,7 @@ import Particles from './shapes/particles'
 export default class App {
 
     constructor() {
+        
         //Canvas
         this.container = document.querySelector( '#main' )
         document.body.appendChild( this.container )
@@ -152,6 +153,7 @@ export default class App {
         this.glitchMode = new Glitch(this.renderer, this.scene, this.camera.pov)
     }
 
+
     checkPattern(){ // Check if torus or sphere, if it's the case, shape is noisy
         if((this.changingState) && ((this.currentPattern.type == 'sphere') || (this.currentPattern.type == 'torus'))){
             this.particlesMaterial.uniforms.u_frequency.value = this.audio.arrAverage(this.audio.getSpectrum())/5
@@ -160,6 +162,9 @@ export default class App {
 
     audioManager() { //AudioManager instanciation
         var button = document.querySelector('.btn')
+        var onSound = document.querySelector('.sound_on')
+        var offSound = document.querySelector('.sound_off')
+
         this.kickTempo = 0
 
         this.audio = new Sound(Audio, 103, .3, () => {
@@ -233,11 +238,25 @@ export default class App {
             }
         }) 
         this.kick.on()
+
+        onSound.addEventListener('click', () => {
+            this.audio.pause()
+            onSound.style.display = 'none'
+            offSound.style.display = 'block'
+        })
+
+        offSound.addEventListener('click', () => {
+            this.audio.play()
+            onSound.style.display = 'block'
+            offSound.style.display = 'none'
+        })
+
+    
     }
     
 
     render() {
-
+    
         this.kickTempo += 1
         this.time += 0.01
 
