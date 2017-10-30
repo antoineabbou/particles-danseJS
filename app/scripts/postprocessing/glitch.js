@@ -11,15 +11,15 @@ export default class Glitch {
 
     constructor (renderer, scene, camera){
 
-        this.composer = new EffectComposer( renderer );
-        this.composer.setSize( window.innerWidth, window.innerHeight );        
-        this.renderScene = new RenderPass(scene, camera);
-        this.copyShader = new ShaderPass(THREE.CopyShader);
-        this.composer.addPass( new RenderPass( scene, camera ) );
+        this.composer = new EffectComposer( renderer )
+        this.composer.setSize( window.innerWidth, window.innerHeight )     
+        this.renderScene = new RenderPass(scene, camera)
+        this.copyShader = new ShaderPass(THREE.CopyShader)
+        this.composer.addPass( new RenderPass( scene, camera ) )
 
-        this.glitchPass = new GlitchPass();
-        this.composer.addPass( this.glitchPass );
-        this.copyShader.renderToScreen = true;
-        
+        this.glitchPass = new GlitchPass()
+        this.composer.addPass( this.glitchPass )
+        this.copyShader.renderToScreen = true
+
     }
 }

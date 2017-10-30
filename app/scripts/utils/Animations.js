@@ -26,8 +26,26 @@ export default class Animations {
     }
 
     firstAnimation() {
-        this.tl.to(this.container, 1, {width:'96%',ease: Expo.easeOut}, '+=1')
-        this.tl.to(this.container, 1, {height:'93%',ease: Expo.easeOut})
+        if(window.innerWidth<=500){
+            this.tl.to(this.container, 1, {width:'91%',ease: Expo.easeOut}, '+=1')
+            this.tl.to(this.container, 1, {height:'95%',ease: Expo.easeOut})
+        }
+        else if(window.innerWidth>500 && window.innerWidth<=767){
+            this.tl.to(this.container, 1, {width:'96%',ease: Expo.easeOut}, '+=1')
+            this.tl.to(this.container, 1, {height:'96%',ease: Expo.easeOut})
+        }
+        else if(window.innerWidth>767 && window.innerWidth<=1024){
+            this.tl.to(this.container, 1, {width:'95%',ease: Expo.easeOut}, '+=1')
+            this.tl.to(this.container, 1, {height:'96%',ease: Expo.easeOut})
+        }
+        else if(window.innerWidth>1024 && window.innerWidth<=1439){
+            this.tl.to(this.container, 1, {width:'96%',ease: Expo.easeOut}, '+=1')
+            this.tl.to(this.container, 1, {height:'93%',ease: Expo.easeOut})
+        }
+        else if(window.innerWidth>1439){
+            this.tl.to(this.container, 1, {width:'96%',ease: Expo.easeOut}, '+=1')
+            this.tl.to(this.container, 1, {height:'93%',ease: Expo.easeOut})
+        }
         this.tl.to(this.title, 1, {opacity:1, y:'-90', ease: Expo.easeOut})
         this.tl.to(this.subtitle, 1, {opacity:1, ease: Expo.easeOut})
         this.tl.to(this.description, 1.2, {opacity:1, ease: Expo.easeOut})
@@ -56,9 +74,29 @@ export default class Animations {
         this.tl.to(this.song, 1, {opacity:0})
         this.tl.to(this.github, 1, {opacity:0}, '-=1')
         this.endWrapper.style.display = 'flex'
-        this.endContainer.style.display = 'block'        
-        this.endTl.to(this.endContainer, 1, {width:'96%',ease: Expo.easeOut}, '+=1')
-        this.endTl.to(this.endContainer, 1, {height:'93%',ease: Expo.easeOut})
+        this.endContainer.style.display = 'block'     
+        
+        
+        if(window.innerWidth<=500){
+            this.endTl.to(this.endContainer, 1, {width:'91%',ease: Expo.easeOut}, '+=1')
+            this.endTl.to(this.endContainer, 1, {height:'95%',ease: Expo.easeOut})
+        }
+        else if(window.innerWidth>500 && window.innerWidth<=767){
+            this.endTl.to(this.endContainer, 1, {width:'96%',ease: Expo.easeOut}, '+=1')
+            this.endTl.to(this.endContainer, 1, {height:'96%',ease: Expo.easeOut})
+        }
+        else if(window.innerWidth>767 && window.innerWidth<=1024){
+            this.endTl.to(this.endContainer, 1, {width:'95%',ease: Expo.easeOut}, '+=1')
+            this.endTl.to(this.endContainer, 1, {height:'96%',ease: Expo.easeOut})
+        }
+        else if(window.innerWidth>1024 && window.innerWidth<=1439){
+            this.endTl.to(this.endContainer, 1, {width:'96%',ease: Expo.easeOut}, '+=1')
+            this.endTl.to(this.endContainer, 1, {height:'93%',ease: Expo.easeOut})
+        }
+        else if(window.innerWidth>1439){
+            this.endTl.to(this.endContainer, 1, {width:'96%',ease: Expo.easeOut}, '+=1')
+            this.endTl.to(this.endContainer, 1, {height:'93%',ease: Expo.easeOut})
+        }
         this.endTl.to(this.endTitle, 1, {opacity:1, y:-40, ease:Power4.easeOut})
         this.endTl.staggerFrom(".social", 1.5, {scale:0.5, opacity:0, ease:Elastic.easeOut, force3D:true}, 0.2)  
     }

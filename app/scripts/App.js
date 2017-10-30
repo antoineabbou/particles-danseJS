@@ -25,8 +25,8 @@ export default class App {
 
     constructor() {
         //Canvas
-        this.container = document.querySelector( '#main' );
-        document.body.appendChild( this.container );
+        this.container = document.querySelector( '#main' )
+        document.body.appendChild( this.container )
 
         //Camera
         this.camera = new Camera(70, window.innerWidth / window.innerHeight, 0.1, this.resolutionZ, 250, 150, 1)
@@ -35,7 +35,7 @@ export default class App {
         this.controls = new OrbitControls(this.camera.pov)
         
         //Scene
-        this.scene = new THREE.Scene();
+        this.scene = new THREE.Scene()
         this.time = 0
         this.distance = 200
         this.resolutionX = window.innerWidth
@@ -44,16 +44,16 @@ export default class App {
 
 
         //Renderer 
-        this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-        this.renderer.setPixelRatio( window.devicePixelRatio );
-        this.renderer.setSize( window.innerWidth, window.innerHeight );
-        this.container.appendChild( this.renderer.domElement );
+        this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } )
+        this.renderer.setPixelRatio( window.devicePixelRatio )
+        this.renderer.setSize( window.innerWidth, window.innerHeight )
+        this.container.appendChild( this.renderer.domElement )
         
         //Resize
-        window.addEventListener('resize', this.onWindowResize.bind(this), false);
-        this.onWindowResize();
+        window.addEventListener('resize', this.onWindowResize.bind(this), false)
+        this.onWindowResize()
 
-        this.renderer.animate( this.render.bind(this) );
+        this.renderer.animate( this.render.bind(this) )
 
         //Utils stuff instanciation
         this.colors = new Colors
@@ -68,8 +68,8 @@ export default class App {
         this.audioManager()
 
         //particles / points
-        this.nbParticles = 20000
-        this.nbPoints = 100
+        this.nbParticles = 15000
+        this.nbPoints = 70
 
         //Ratio - Speed of particles when changing
         this.initialRatio = 0.0055 
@@ -78,21 +78,21 @@ export default class App {
         //Instances of white particles
         this.particles = new Particles(this.nbPoints)
         for(var i = 0; i < this.nbPoints; i++){
-            this.scene.add(this.particles.particles[i]);
+            this.scene.add(this.particles.particles[i])
         }
 
         //instance of the first shape 
         this.initial = new Initial(this.nbParticles)
 
         //instances of other shapes
-        this.cube = new Cube(this.nbParticles);
+        this.cube = new Cube(this.nbParticles)
         this.octa = new Octa(this.nbParticles)
         this.sphere = new Sphere(this.nbParticles)
         this.tear = new Tear(this.nbParticles)
         this.torus = new Torus(this.nbParticles)
         
 
-        //We are putting all the shapes in an array to manage it later
+        //We are putting all the shapes into an array to manage it later
         this.states = []
         this.cubeState = {
             type : 'cube', 
@@ -138,10 +138,10 @@ export default class App {
             uniforms : uniforms,
             vertexShader: vertParticles,
             fragmentShader: fragParticles
-         } );
+         } )
 
-        this.particlesField = new THREE.Points(this.initial.initialGeometry , this.particlesMaterial );
-        this.scene.add( this.particlesField );
+        this.particlesField = new THREE.Points(this.initial.initialGeometry , this.particlesMaterial )
+        this.scene.add( this.particlesField )
         
         
         // Launching first animation 
@@ -160,15 +160,15 @@ export default class App {
 
     audioManager() { //AudioManager instanciation
         var button = document.querySelector('.btn')
-        this.kickTempo = 0;
+        this.kickTempo = 0
 
         this.audio = new Sound(Audio, 103, .3, () => {
             this.audio._load(Audio, () => {
                 button.addEventListener('click', ()=>{
                     this.audio.play()
                 })
-            });
-        }, false);
+            })
+        }, false)
 
 
         this.audio.between('first movement', 0, 18.5, () => {
@@ -181,17 +181,17 @@ export default class App {
         this.audio.between('normal part', 46, 121, ()=> {
             this.bass.off()
             document.querySelector('canvas').style.background = '#1a1a1a'
-            this.glitchMode.glitchPass.renderToScreen = false;
+            this.glitchMode.glitchPass.renderToScreen = false
 
         })
         
         this.audio.between('second drop', 121, 129.5, () => {
-            this.bass.on();
+            this.bass.on()
         })
         this.audio.between('normal part', 129.5, 205.5, ()=> {
             this.bass.off()
             document.querySelector('canvas').style.background = '#1a1a1a'
-            this.glitchMode.glitchPass.renderToScreen = false;
+            this.glitchMode.glitchPass.renderToScreen = false
         })
 
         //End of the sound 
@@ -209,7 +209,7 @@ export default class App {
                if(this.kickTempo > 10){
                     this.kickTempo = 0
                     document.querySelector('canvas').style.background = this.colors.getNewColor()
-                    this.glitchMode.glitchPass.renderToScreen = true;
+                    this.glitchMode.glitchPass.renderToScreen = true
                 }
             }
         }) 
@@ -239,9 +239,9 @@ export default class App {
     render() {
 
         this.kickTempo += 1
-        this.time += 0.01;
+        this.time += 0.01
 
-        this.particlesMaterial.uniforms.u_time.value = this.time;
+        this.particlesMaterial.uniforms.u_time.value = this.time
         this.particlesMaterial.uniforms.u_frequency.value = 1
 
         this.checkPattern() 
@@ -255,15 +255,15 @@ export default class App {
 
         this.camera.rotate(this.particlesField.position, this.distance, this.time ) //Constantly rotate around the shape
 
-        this.renderer.render( this.scene, this.camera.pov );
+        this.renderer.render( this.scene, this.camera.pov )
 
-        this.glitchMode.composer.render(); //Glitch mode on drop
+        this.glitchMode.composer.render() //Glitch mode on drop
         
     }
 
     onWindowResize() { //Resize stuff
-    	this.camera.pov.aspect = window.innerWidth / window.innerHeight;
-    	this.camera.pov.updateProjectionMatrix();
-    	this.renderer.setSize( window.innerWidth, window.innerHeight );
+    	this.camera.pov.aspect = window.innerWidth / window.innerHeight
+    	this.camera.pov.updateProjectionMatrix()
+    	this.renderer.setSize( window.innerWidth, window.innerHeight )
     }
 }
