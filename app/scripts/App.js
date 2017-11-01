@@ -208,12 +208,12 @@ export default class App {
         onSound.addEventListener('click', () => {
             this.audio.pause()
             onSound.style.display = 'none'
-            offSound.style.display = 'block'
+            offSound.style.display = 'inline-block'
         })
 
         offSound.addEventListener('click', () => {
             this.audio.play()
-            onSound.style.display = 'block'
+            onSound.style.display = 'inline-block'
             offSound.style.display = 'none'
         })
     }
