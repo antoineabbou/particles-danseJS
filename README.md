@@ -6,7 +6,7 @@
 
 ## Setup
 * After cloning the project
-* Execute `cd audio-threeJS`
+* Execute `cd particles-danseJS`
 * Execute `npm install`
 
 ## Environments
