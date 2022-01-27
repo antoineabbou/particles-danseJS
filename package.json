@@ -33,7 +33,7 @@
     "webpack-glsl-loader": "^1.0.1"
   },
   "dependencies": {
-    "three": "^0.87.1",
+    "three": "^0.137.0",
     "three-orbit-controls": "^82.1.0",
     "webvr-polyfill": "^0.9.38"
   }
